@@ -1,10 +1,6 @@
 var sock = require('./ircsocket');
 
-var pingRegx = /^PING\s:(.*)/g
-
 function connect(url, port, username, connectCallBack, reConnectCallBack) {
-
-	gUsername = username;
 
 	sock.connect(
 		'irc.aberwiki.org',
@@ -53,17 +49,15 @@ function sendActionMsg(resp, message)  {
 
 function handleIRCServer(data) {
 
-	var msg    = data.toString();
-	var groups = pingRegx.exec(msg);
+	var msg      = data.toString();
 
-	console.log('MSG:' + msg);
-	console.log('GROUPS:' + groups);
+	var pingRegx = /^PING\s:(.*)/g;
 
-	if (groups) {
-		if (groups.length > 0) {
-			sock.sendData('PONG :' + groups[1]);
-		}
-	}	
+	var groups   = pingRegx.exec(msg);
+
+	if (groups && groups.length > 0) {
+		sock.sendData('PONG :' + groups[1]);
+	}
 }
 
 exports.connect         = connect;

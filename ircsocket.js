@@ -2,23 +2,66 @@ var net = require('net');
 
 var socket = null;
 
-function connect(url, port, onDataCallBack){
+var cTimeout = 600000;
+
+var gPort                = 0;
+var gUrl                 = '';
+var gOnDataCallBack      = null;
+var gOnReconnectCallBack = null;
+
+function connect(url, port, onDataCallBack, onReconnectCallBack){
+	gUrl                 = url;
+	gPort                = port;
+	gOnDataCallBack      = onDataCallBack;
+	gOnReconnectCallBack = onReconnectCallBack;
+
+	inConnect();
+}
+
+function inConnect() {
 
 	if (!socket) {
 		socket = net.Socket();
+
+		socket.setTimeout(cTimeout);
 
 		socket.on(
 			'data',
 			function(data) {
 				console.log('-> ' + data.toString());
-				onDataCallBack(data);
+				gOnDataCallBack(data);
 			}
 		);
 
-		socket.connect(port, url);
+		socket.on(
+			'end',
+			function(data) {
+				handleReconnect();
+			}
+		);
+
+		socket.on(
+			'timeout',
+			function(data) {
+				handleReconnect();
+			}
+		);
+
+		socket.connect(gPort, gUrl);
 	} else {
 		console.error('Socket already open!');
 	}
+}
+
+function handleReconnect() {
+	console.log('Reconnecting');
+
+	socket.destroy();
+
+	socket = null;
+
+	inConnect();
+	gOnReconnectCallBack();
 }
 
 function sendData(data) {
@@ -40,7 +83,7 @@ function disconnect() {
 }
 
 function isConnected() {
-	return (socket);
+	return (socket != null);
 }
 
 exports.connect     = connect;

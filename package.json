@@ -1,8 +1,9 @@
 {
   "name": "JSBot",
-  "description": "caravan pc backend",
+  "description": "This is a replacement for JavaBot",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "mocha": "^2.0.1"
   }
 }

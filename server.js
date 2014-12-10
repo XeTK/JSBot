@@ -8,11 +8,18 @@ irc.connect(
 	'JSBot',
 	function(data) {
 		console.log('some new data ' + data);
+	},
+	function(){
+		joinServer();
 	}
 );
 
-irc.joinChannel('#xetk');
-irc.sendPrivMsg('#xetk',   'Hello World');
-irc.sendActionMsg('#xetk', 'Hello World'); 
+joinServer();
+
+function joinServer() {
+	irc.joinChannel('#xetk');
+	irc.sendPrivMsg('#xetk',   'Hello World');
+	irc.sendActionMsg('#xetk', 'Hello World'); 
+}
 
 console.log('Ending application');

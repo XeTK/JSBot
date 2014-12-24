@@ -1,0 +1,35 @@
+PING
+(HOSTNAME)
+^PING\s:([\w\d]*)
+
+PRIVMSG
+(NICKNAME) (USERNAME@HOSTNAME) (CHANNEL) (MESSAGE CONTENTS)
+^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sPRIVMSG\s([\w\d\#\-]*)\s(?:\:)?(.*)
+
+QUIT
+(NICKNAME) (USERNAME@HOSTNAME) (QUIT MESSAGE)
+^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sQUIT\s(?:\:)?(.*)
+
+PART
+(NICKNAME) (USERNAME@HOSTNAME) (CHANNEL) (QUIT MESSAGE)
+^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sPART\s([\w\d\#\-]*)\s(?:\:)?(.*)
+
+JOIN 
+(NICKNAME) (USERNAME@HOSTNAME) (CHANNEL)
+^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sJOIN\s(?:\:)?(#.*)
+
+MODE
+(NICKNAME) (USERNAME@HOSTNAME) (CHANNEL) (PARAMETER) (OPTIONS)
+^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sMODE\s([\w\d\#\-]*)\s([-+].)(.*)
+
+KICK
+(NICKNAME) (USERNAME@HOSTNAME) (CHANNEL) (USER) (KICK MESSAGE)
+^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sKICK\s([\w\d\#\-]*)\s([\w\d]*)\s(?:\:)?(.*)
+
+INVITE
+(NICKNAME) (USERNAME@HOSTNAME) (USER) (CHANNEL)
+^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sINVITE\s([\w\d]*)\s:(#[\w\d]*)
+
+SYSTEM MESSAGE
+(HOST) (STATUS CODE) (USER) (MESSAGE)
+^:([\w\d\@\/\-\.]*)\s([\d]{3})\s([\w\d]*)\s(?:[\:\@\=]?(?:\s)?)?(.*)

@@ -1,5 +1,18 @@
 var sock = require('./ircsocket');
 
+var callbacks = [];
+
+function callback(call, func) {
+	var iCall = call;
+	var iFunc = func;
+	this.func = function(obj) {
+		iFunc(obj);
+	}
+	this.call = function() {
+		return iCall;
+	}
+}
+
 function connect(url, port, username, tls, connectCallBack, reConnectCallBack) {
 
 	sock.connect(
@@ -48,7 +61,24 @@ function sendActionMsg(resp, message)  {
 	sendPrivMsg(resp, msg); 
 }
 
+function addCallBack(call, func) {
+	var tmp = new callback(call, func);
+	callbacks.push(tmp);
+}
+
 function handleIRCServer(data) {
+
+	function quickMatch(regx, type) {
+
+		groups = regx.exec(msg);
+
+		if (groups && groups.length > 0) {
+			runCallBacks(type, groups);
+			return true;
+		}
+
+		return false;
+	}
 
 	var msg      = data.toString();
 
@@ -58,10 +88,46 @@ function handleIRCServer(data) {
 
 	if (groups && groups.length > 0) {
 		sock.sendData('PONG :' + groups[1]);
+		return;
+	}
+
+	// PRIVMSG
+	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sPRIVMSG\s([\w\d\#\-]*)\s(?:\:)?(.*)/g, 'privmsg');
+
+	// QUIT
+	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sQUIT\s(?:\:)?(.*)/g, 'quit');
+
+	// PART
+	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sPART\s([\w\d\#\-]*)\s(?:\:)?(.*)/g, 'part');
+
+	// JOIN
+	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sJOIN\s(?:\:)?(#.*)/g, 'join');
+
+	// MODE
+	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sMODE\s([\w\d\#\-]*)\s([-+].)(.*)/g, 'mode');
+
+	// KICK
+	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sKICK\s([\w\d\#\-]*)\s([\w\d]*)\s(?:\:)?(.*)/g, 'kick');
+
+	// INVITE
+	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sINVITE\s([\w\d]*)\s:(#[\w\d]*)/g, 'invite');
+
+	// SERVER
+	quickMatch(/^:([\w\d\@\/\-\.]*)\s([\d]{3})\s([\w\d]*)\s(?:[\:\@\=]?(?:\s)?)?(.*)/g, 'server');
+
+}
+
+function runCallBacks(type, groups) {
+	for (var i = 0; i < callbacks.length; i++) {
+		var obj = callbacks[i];
+		if (obj.call() == type) {
+			obj.func(groups);
+		}
 	}
 }
 
-exports.connect         = connect;
-exports.joinChannel     = joinChannel;
-exports.sendPrivMsg     = sendPrivMsg;
-exports.sendActionMsg   = sendActionMsg;
+exports.connect       = connect;
+exports.joinChannel   = joinChannel;
+exports.sendPrivMsg   = sendPrivMsg;
+exports.sendActionMsg = sendActionMsg;
+exports.addCallBack   = addCallBack;

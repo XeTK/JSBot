@@ -13,9 +13,13 @@ var gOnDataCallBack      = null;
 var gOnReconnectCallBack = null;
 var gTLS                 = false;
 
+var priKeyPath = 'private-key.pem';
+var certPath   = 'public-cert.pem';
+
 var options = {};
 
 function connect(url, port, tls, onDataCallBack, onReconnectCallBack){
+
 	gUrl                 = url;
 	gPort                = port;
 	gTLS                 = tls;
@@ -23,9 +27,6 @@ function connect(url, port, tls, onDataCallBack, onReconnectCallBack){
 	gOnReconnectCallBack = onReconnectCallBack;
 
 	if (tls) {
-
-		var priKeyPath = 'private-key.pem';
-		var certPath   = 'public-cert.pem';
 
 		var fKey  = fs.existsSync(priKeyPath) ? fs.readFileSync(priKeyPath) : null;
 		var fCert = fs.existsSync(certPath)   ? fs.readFileSync(certPath)   : null;
@@ -47,7 +48,8 @@ function connect(url, port, tls, onDataCallBack, onReconnectCallBack){
 function inConnect() {
 
 	if (!socket) {
-		if (tls) {
+
+		if (gTLS) {
 			socket = tls.connect(gPort, gUrl, options);
 		} else {
 			socket = net.Socket();

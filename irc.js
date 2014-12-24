@@ -13,7 +13,7 @@ function callback(call, func) {
 	}
 }
 
-function connect(url, port, username, tls, connectCallBack, reConnectCallBack) {
+function connect(url, port, username, tls, reConnectCallBack) {
 
 	sock.connect(
 		url,
@@ -21,7 +21,6 @@ function connect(url, port, username, tls, connectCallBack, reConnectCallBack) {
 		tls,
 		function(data) {
 			handleIRCServer(data);
-			connectCallBack(data);
 		},
 		function() {
 			connectToServer(username);

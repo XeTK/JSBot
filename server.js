@@ -15,9 +15,6 @@ irc.connect(
 	7070,
 	'SpunkyJr',
 	true,
-	function(data) {
-		//console.log('some new data ' + data);
-	},
 	function(){
 		joinServer();
 	}

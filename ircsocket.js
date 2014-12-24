@@ -1,4 +1,5 @@
-var net = require('net');
+var net     = require('net');
+var colours = require('colors')
 
 var socket = null;
 
@@ -28,7 +29,7 @@ function inConnect() {
 		socket.on(
 			'data',
 			function(data) {
-				console.log('-> ' + data.toString());
+				console.log(('-> ' + data.toString()).cyan);
 				gOnDataCallBack(data);
 			}
 		);
@@ -66,7 +67,7 @@ function handleReconnect() {
 
 function sendData(data) {
 	if (socket) {
-		console.log('<- ' + String(data));
+		console.log(('<- ' + String(data)).red);
 		socket.write(data + '\r\n');
 	} else {
 		console.error('There is no socket open!');

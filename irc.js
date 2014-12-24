@@ -1,10 +1,11 @@
 var sock = require('./ircsocket');
 
-function connect(url, port, username, connectCallBack, reConnectCallBack) {
+function connect(url, port, username, tls, connectCallBack, reConnectCallBack) {
 
 	sock.connect(
-		'irc.aberwiki.org',
-		6667, 
+		url,
+		port, 
+		tls,
 		function(data) {
 			handleIRCServer(data);
 			connectCallBack(data);

@@ -1,6 +1,9 @@
-var net = require('net');
+var net     = require('net');
+var tls     = require('tls');
+var fs      = require('fs');
+var colours = require('colors')
 
-var socket = null;
+var socket  = null;
 
 var cTimeout = 600000;
 
@@ -8,12 +11,35 @@ var gPort                = 0;
 var gUrl                 = '';
 var gOnDataCallBack      = null;
 var gOnReconnectCallBack = null;
+var gTLS                 = false;
 
-function connect(url, port, onDataCallBack, onReconnectCallBack){
+var options = {};
+
+function connect(url, port, tls, onDataCallBack, onReconnectCallBack){
 	gUrl                 = url;
 	gPort                = port;
+	gTLS                 = tls;
 	gOnDataCallBack      = onDataCallBack;
 	gOnReconnectCallBack = onReconnectCallBack;
+
+	if (tls) {
+
+		var priKeyPath = 'private-key.pem';
+		var certPath   = 'public-cert.pem';
+
+		var fKey  = fs.existsSync(priKeyPath) ? fs.readFileSync(priKeyPath) : null;
+		var fCert = fs.existsSync(certPath)   ? fs.readFileSync(certPath)   : null;
+
+		if (!fKey || !fCert) {
+			console.error('TLS Cert or Private Key missing!'.red);
+			process.exit(1);
+		}
+
+		options = {
+			key:  fKey,
+			cert: fCert
+		};
+	}
 
 	inConnect();
 }
@@ -21,14 +47,19 @@ function connect(url, port, onDataCallBack, onReconnectCallBack){
 function inConnect() {
 
 	if (!socket) {
-		socket = net.Socket();
+		if (tls) {
+			socket = tls.connect(gPort, gUrl, options);
+		} else {
+			socket = net.Socket();
+			socket.connect(gPort, gUrl);
+		}
 
 		socket.setTimeout(cTimeout);
 
 		socket.on(
 			'data',
 			function(data) {
-				console.log('-> ' + data.toString());
+				console.log(('-> ' + data.toString()).cyan);
 				gOnDataCallBack(data);
 			}
 		);
@@ -47,7 +78,6 @@ function inConnect() {
 			}
 		);
 
-		socket.connect(gPort, gUrl);
 	} else {
 		console.error('Socket already open!');
 	}
@@ -66,7 +96,7 @@ function handleReconnect() {
 
 function sendData(data) {
 	if (socket) {
-		console.log('<- ' + String(data));
+		console.log(('<- ' + String(data)).yellow);
 		socket.write(data + '\r\n');
 	} else {
 		console.error('There is no socket open!');

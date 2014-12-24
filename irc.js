@@ -121,9 +121,62 @@ function runCallBacks(type, groups) {
 	for (var i = 0; i < callbacks.length; i++) {
 		var obj = callbacks[i];
 		if (obj.call() == type) {
-			obj.func(groups);
+			var data = convertGroupsToObjects(groups, type);
+			obj.func(data);
 		}
 	}
+}
+
+function convertGroupsToObjects(groups, type) {
+	var ret = {
+		nickname: groups[1],
+		host:     groups[2]
+	};
+
+	switch(type) {
+		case 'privmsg':
+			ret['channel'] = groups[3];
+			ret['message'] = groups[4];
+			break;
+		case 'quit':
+			ret['message'] = groups[3];
+			break;
+		case 'part':
+			ret['channel'] = groups[3];
+			ret['message'] = groups[4];
+			break;
+		case 'join':
+			ret['channel'] = groups[3];
+			break;
+		case 'mode':
+			ret['channel']   = groups[3];
+			ret['parameter'] = groups[4];
+			ret['option']    = groups[5];
+			break;
+		case 'kick':
+			ret['channel'] = groups[3];
+			ret['user']    = groups[4];
+			ret['message'] = groups[5];
+			break;
+		case 'invite':
+			ret['user']    = groups[3];
+			ret['channel'] = groups[4];
+			break;
+		case 'server':
+			ret = {
+				host:    groups[1],
+				status:  groups[2],
+				user:    groups[3],
+				message: groups[4]
+			}
+			break;
+		default:
+			ret = {};
+			break;
+	}
+
+	return ret;
+
 }
 
 exports.connect       = connect;

@@ -27,6 +27,7 @@ function connect(url, port, username, tls, reConnectCallBack) {
 			reConnectCallBack();
 		}
 	);
+
 	connectToServer(username);
 }
 
@@ -90,29 +91,49 @@ function handleIRCServer(data) {
 		return;
 	}
 
-	// PRIVMSG
-	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sPRIVMSG\s([\w\d\#\-]*)\s(?:\:)?(.*)/g, 'privmsg');
+	var regexList = [
+		{
+			regex: /^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sPRIVMSG\s([\w\d\#\-]*)\s(?:\:)?(.*)/g,
+			func:  'privmsg'
+		},
+		{
+			regex: /^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sQUIT\s(?:\:)?(.*)/g,
+			func: 'quit'
+		},
+		{
+			regex: /^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sPART\s([\w\d\#\-]*)\s(?:\:)?(.*)/g,
+			func:  'part'
+		},
+		{
+			regex: /^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sJOIN\s(?:\:)?(#.*)/g,
+			func:  'join'
+		},
+		{
+			regex: /^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sMODE\s([\w\d\#\-]*)\s([-+].)(.*)/g,
+			func:  'mode'
+		},
+		{
+			regex: /^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sKICK\s([\w\d\#\-]*)\s([\w\d]*)\s(?:\:)?(.*)/g,
+			func:  'kick'
+		},
+		{
+			regex: /^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sINVITE\s([\w\d]*)\s:(#[\w\d]*)/g,
+			func:  'invite'
+		},
+		{
+			regex: /^:([\w\d\@\/\-\.]*)\s([\d]{3})\s([\w\d]*)\s(?:[\:\@\=]?(?:\s)?)?(.*)/g,
+			func:  'server'
+		}
+	];
 
-	// QUIT
-	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sQUIT\s(?:\:)?(.*)/g, 'quit');
+	for (var i = 0; i < regexList.length; i++) {
+		var regObj = regexList[i];
 
-	// PART
-	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sPART\s([\w\d\#\-]*)\s(?:\:)?(.*)/g, 'part');
-
-	// JOIN
-	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sJOIN\s(?:\:)?(#.*)/g, 'join');
-
-	// MODE
-	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sMODE\s([\w\d\#\-]*)\s([-+].)(.*)/g, 'mode');
-
-	// KICK
-	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sKICK\s([\w\d\#\-]*)\s([\w\d]*)\s(?:\:)?(.*)/g, 'kick');
-
-	// INVITE
-	quickMatch(/^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sINVITE\s([\w\d]*)\s:(#[\w\d]*)/g, 'invite');
-
-	// SERVER
-	quickMatch(/^:([\w\d\@\/\-\.]*)\s([\d]{3})\s([\w\d]*)\s(?:[\:\@\=]?(?:\s)?)?(.*)/g, 'server');
+		var retVal = quickMatch(regObj.regex, regObj.func);
+		
+		if (retVal)
+			break;
+	}
 
 }
 
@@ -128,6 +149,8 @@ function runCallBacks(type, groups) {
 
 function convertGroupsToObjects(groups, type) {
 	var ret = {
+		time:     new Date(),
+		type:     type,
 		nickname: groups[1],
 		host:     groups[2]
 	};
@@ -162,12 +185,11 @@ function convertGroupsToObjects(groups, type) {
 			ret['channel'] = groups[4];
 			break;
 		case 'server':
-			ret = {
-				host:    groups[1],
-				status:  groups[2],
-				user:    groups[3],
-				message: groups[4]
-			}
+			ret['host']    = groups[1];
+			ret['status']  = groups[2];
+			ret['user']    = groups[3];
+			ret['message'] = groups[4];
+			delete ret['nickname'];
 			break;
 		default:
 			ret = {};

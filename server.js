@@ -9,6 +9,13 @@ irc.addCallBack(
 	}
 );
 
+irc.addCallBack(
+	'server',
+	function(data) {
+		irc.sendPrivMsg('#xetk', JSON.stringify(data));
+	}
+);
+
 
 irc.connect(
 	'holmes.freenode.net',

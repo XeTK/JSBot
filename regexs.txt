@@ -32,4 +32,4 @@ INVITE
 
 SYSTEM MESSAGE
 (HOST) (STATUS CODE) (USER) (MESSAGE)
-^:([\w\d\@\/\-\.]*)\s([\d]{3})\s([\w\d]*)\s(?:[\:\@\=]?(?:\s)?)?(.*)
+^:([\w\d\@\/\-\.]*)\s([\d]{3})\s([\w\d]*)\s(?:[\:\@\=]?(?:\s)?)?(.*)w

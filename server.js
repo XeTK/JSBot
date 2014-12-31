@@ -10,6 +10,13 @@ irc.addCallBack(
 );
 
 irc.addCallBack(
+	'privmsg',
+	function(data) {
+		irc.sendPrivMsg('#xetk', 'Too CallBacks');
+	}
+);
+
+irc.addCallBack(
 	'server',
 	function(data) {
 		irc.sendPrivMsg('#xetk', JSON.stringify(data));

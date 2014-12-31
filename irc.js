@@ -68,30 +68,11 @@ function addCallBack(call, func) {
 
 function handleIRCServer(data) {
 
-	function quickMatch(regx, type) {
-
-		groups = regx.exec(msg);
-
-		if (groups && groups.length > 0) {
-			runCallBacks(type, groups);
-			return true;
-		}
-
-		return false;
-	}
-
-	var msg      = data.toString();
-
-	var pingRegx = /^PING\s:(.*)/g;
-
-	var groups   = pingRegx.exec(msg);
-
-	if (groups && groups.length > 0) {
-		sock.sendData('PONG :' + groups[1]);
-		return;
-	}
-
 	var regexList = [
+		{
+			regex: /^PING\s:(.*)/g,
+			func:  'ping'
+		},
 		{
 			regex: /^:([\w\d]*)!(?:~)?([\w\d\@\/\-\.]*)\sPRIVMSG\s([\w\d\#\-]*)\s(?:\:)?(.*)/g,
 			func:  'privmsg'
@@ -126,11 +107,29 @@ function handleIRCServer(data) {
 		}
 	];
 
+	function quickMatch(regx, type) {
+
+		groups = regx.exec(data);
+
+		if (groups && groups.length > 0) {
+
+			if (type == 'ping') {
+				sock.sendData('PONG :' + groups[1]);
+			} else {
+				runCallBacks(type, groups);
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 	for (var i = 0; i < regexList.length; i++) {
 		var regObj = regexList[i];
 
 		var retVal = quickMatch(regObj.regex, regObj.func);
-		
+
 		if (retVal)
 			break;
 	}

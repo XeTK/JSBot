@@ -1,27 +1,38 @@
 var irc = require('./irc');
 
+var Lipsum = require('node-lipsum');
+
 console.log('Starting application');
 
 irc.addCallBack(
 	'privmsg',
 	function(data) {
-		irc.sendPrivMsg('#xetk', JSON.stringify(data));
+		if (data.message == 'test') {
+			var lipsum = new Lipsum();
+
+			var lipsumOpts = {
+			  start: 'yes',
+			  what: 'bytes',
+			  amount: 2000
+			};
+
+			lipsum.getText(
+				function(text) {
+					irc.sendPrivMsg('#xetk', text);
+				}, 
+				lipsumOpts
+			);
+		}
+		//irc.sendPrivMsg('#xetk', JSON.stringify(data));
 	}
 );
 
-irc.addCallBack(
-	'privmsg',
-	function(data) {
-		irc.sendPrivMsg('#xetk', 'Too CallBacks');
-	}
-);
-
-irc.addCallBack(
+/*irc.addCallBack(
 	'server',
 	function(data) {
 		irc.sendPrivMsg('#xetk', JSON.stringify(data));
 	}
-);
+);*/
 
 
 irc.connect(

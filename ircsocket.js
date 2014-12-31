@@ -98,8 +98,10 @@ function handleReconnect() {
 
 function sendData(data) {
 	if (socket) {
+
 		console.log(('<- ' + String(data)).yellow);
 		socket.write(data + '\r\n');
+
 	} else {
 		console.error('There is no socket open!');
 	}

@@ -2,6 +2,8 @@ var sock = require('./ircsocket');
 
 var callbacks = [];
 
+var cMsgLen = 410;
+
 function callback(call, func) {
 	var iCall = call;
 	var iFunc = func;
@@ -50,7 +52,13 @@ function joinChannel(channel) {
 
 function sendPrivMsg(resp, message)  {
 	if (sock.isConnected()) {
-		sock.sendData('PRIVMSG ' + resp + ' :' + message);
+		var dataArr = limitStrLen(message);
+
+		dataArr.forEach(
+			function(tData) {
+				sock.sendData('PRIVMSG ' + resp + ' :' + tData);
+			}
+		);
 	} else {
 		console.error('Not connected to server!');
 	}
@@ -64,6 +72,41 @@ function sendActionMsg(resp, message)  {
 function addCallBack(call, func) {
 	var tmp = new callback(call, func);
 	callbacks.push(tmp);
+}
+
+function limitStrLen(data) {
+	var tmp = data;
+
+	var ret = [];
+
+	if (tmp.length > cMsgLen) {
+		while (true) {
+			if (tmp.length > cMsgLen) {
+
+				for (var j = 0; j < tmp.length; j++) {
+										
+					var x = cMsgLen - j;
+
+					var curChar = tmp[x];
+
+					if (curChar == ' ') {
+						var t = tmp.substring(0, x);
+						ret.push(t);
+
+						tmp = tmp.substring(x + 1, tmp.length);
+						break;
+					}
+				}
+			} else {
+				ret.push(tmp);
+				break;
+			}
+		}
+	} else {
+		ret.push(data);
+	}
+
+	return ret;
 }
 
 function handleIRCServer(data) {

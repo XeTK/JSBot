@@ -98,7 +98,8 @@ function handleReconnect() {
 
 function sendData(data) {
 	if (socket) {
-
+		data = data.replace(/(\r|\n)/g, "");
+		
 		console.log(('<- ' + String(data)).yellow);
 		socket.write(data + '\r\n');
 

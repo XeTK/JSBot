@@ -6,7 +6,7 @@ console.log('Starting application');
 irc.connect(
 	'irc.aberwiki.org',
 	6667,
-	'SpunkyJr',
+	'SpunkyJrTest',
 	false,
 	function(){
 		joinServer();

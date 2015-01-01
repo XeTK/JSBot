@@ -2,10 +2,9 @@ var request = require('request');
 
 var colour = require('../irccolour');
 
-var id = require('../imgur_id');
+var keys = require('../keys');
 
 function handler(irc) {
-	console.log('Setup imgur callback');
 
 	irc.addCallBack(
 		'privmsg',
@@ -28,7 +27,7 @@ function handler(irc) {
 				var options = {
 				    url: iURL + groups[2],
 				    headers: {
-				        'Authorization': 'Client-ID ' + id.id
+				        'Authorization': 'Client-ID ' + keys.imgur
 				    }
 				};
 
@@ -38,11 +37,11 @@ function handler(irc) {
 
 				        info = info.data;
 
-				        var str = '';
-
 				        var blk = colour.getColour('black');
 				        var wht = colour.getColour('white');
 				        var gre = colour.getColour('green');
+
+				        var str = '';
 
 				        str += colour.colourStr('I', gre, blk);
 				        str += colour.colourStr('MGUR', wht, blk);
@@ -57,7 +56,7 @@ function handler(irc) {
 				        	str += 'Nameless Picture';
 
 				        if (info.type)
-				        	str += ' {' + info.type + '} ';
+				        	str += ' {' + info.type + '}';
 
 				        if (info.views)
 				        	str += ' - ' + info.views + ' views';

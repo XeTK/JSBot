@@ -190,6 +190,7 @@ function runCallBacks(type, groups) {
 }
 
 function convertGroupsToObjects(groups, type) {
+	
 	var ret = {
 		time:     new Date(),
 		type:     type,

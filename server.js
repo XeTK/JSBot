@@ -4,10 +4,10 @@ var loader = require('./loader')
 console.log('Starting application');
 
 irc.connect(
-	'holmes.freenode.net',
-	7070,
+	'irc.aberwiki.org',
+	6667,
 	'SpunkyJr',
-	true,
+	false,
 	function(){
 		joinServer();
 	}

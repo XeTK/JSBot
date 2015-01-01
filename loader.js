@@ -40,4 +40,3 @@ files.forEach(
 );
 
 exports.module_holder = module_holder;
-// the usual server stuff goes here

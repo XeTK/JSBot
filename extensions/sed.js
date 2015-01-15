@@ -54,7 +54,6 @@ function handler(irc) {
 						else {
 							engine.search = new RegExp(engine.search);
 						}
-						console.log("regex: " + engine.search.toString());
 					}
 					catch(err) {
 						irc.sendPrivMsg(data.channel, data.nickname + ": " + err);
@@ -186,7 +185,6 @@ function parseSed(data, irc) {
 				engine.valid = false;
 				return;
 			}
-			console.log("Woo we have mods: " + engine.mod);
 		}
 		else if(index == 1) {
 			var tmp;

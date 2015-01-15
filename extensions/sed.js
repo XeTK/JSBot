@@ -172,7 +172,6 @@ function parseSed(data, irc) {
 			proceed = false;
 		}
 	}
-	console.log("Number of indices: " + indices.length);
 
 	// Populate engine.search, engine.replace, and engine.mods using the indices array.
 	for(var index = 0; index < indices.length; index++) {

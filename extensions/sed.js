@@ -38,10 +38,6 @@ function handler(irc) {
 			// Well it *looks* like a regex, now parse it.
 			parseSed(data, irc);
 
-			if(!engine.valid) {
-				// Oh no an error. Do something.
-			}
-
 			sedstack[ data.nickname ].pop(); // don't want the sed command on the stack.
 
 			if(engine.type === 'DFA') {
@@ -176,17 +172,21 @@ function parseSed(data, irc) {
 			proceed = false;
 		}
 	}
+	console.log("Number of indices: " + indices.length);
 
 	// Populate engine.search, engine.replace, and engine.mods using the indices array.
 	for(var index = 0; index < indices.length; index++) {
 		if(index == 2) {
+			// Modifiers.
 			engine.mod = expr.slice(indices[index] + 1);
 			if(!engine.mod.match(/^((gi|ig|g|i)(\s|$))/)) {
 				engine.valid = false;
+				engine.mod = null;
 				return;
 			}
 		}
 		else if(index == 1) {
+			// Replacement.
 			var tmp;
 			if(indices.length < 3) { // i.e. there's no final / to terminate the sed.
 				// Slice from after the index to the end.
@@ -196,10 +196,21 @@ function parseSed(data, irc) {
 				tmp = expr.slice(indices[index] + 1, indices[index + 1]);
 			}
 
-			engine.replace = tmp.replace(/\\(\\|\/)/g, "$1");
+			engine.replace = tmp.replace(/\\(\\|\/)/g, "$1"); // Unescape slashes.
 		}
 		else if(index == 0) {
-			engine.search = expr.slice(indices[index] + 1, indices[index + 1]);
+			// Search pattern.
+			if((indices.length < 3 || indices.length > 3) && expr.charAt(expr.length - 1) ==  '/') {
+				if(indices.length < 3) {
+					engine.search = expr.slice(indices[index] + 1, indices[index + 1] + 1);
+				}
+				if(indices.length > 3) {
+					engine.search = expr.slice(indices[index] + 1, indices[index + 1] + 2);
+				}
+			}
+			else {
+				engine.search = expr.slice(indices[index] + 1, indices[index + 1]);
+			}
 		}
 				
 	}

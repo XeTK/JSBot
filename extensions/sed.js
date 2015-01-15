@@ -27,7 +27,7 @@ function handler(irc) {
 
 			addStack(data);
 
-			var regex = /^([a-zA-Z0-9^\\_\{\}\[\]\|`~^-]+\s?[:,~-]\s?)?s\/.+?\/.*?\/[gmixs]*?/;
+			var regex = /^([a-zA-Z0-9^\\_\{\}\[\]\|`~^-]+\s?[:,~-]\s?)?s\/.+?\/.*?(\/[gi]*)?/;
 
 			if(!regex.test(data.message)) {
 				return;
@@ -182,14 +182,16 @@ function parseSed(data, irc) {
 			}
 		}
 		else if(index == 1) {
+			var tmp;
 			if(indices.length < 3) { // i.e. there's no final / to terminate the sed.
 				// Slice from after the index to the end.
-				engine.replace = expr.slice(indices[index] + 1);
+				tmp = expr.slice(indices[index] + 1);
 			}
 			else { // Slice from after the index until before the next index.
-				var tmp = expr.slice(indices[index] + 1, indices[index + 1]);
-				engine.replace = tmp.replace(/\\(\\|\/)/g, "$1");
+				tmp = expr.slice(indices[index] + 1, indices[index + 1]);
 			}
+
+			engine.replace = tmp.replace(/\\(\\|\/)/g, "$1");
 		}
 		else if(index == 0) {
 			engine.search = expr.slice(indices[index] + 1, indices[index + 1]);

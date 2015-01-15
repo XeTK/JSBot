@@ -15,7 +15,7 @@ function handler(irc) {
 
 				lipsum.getText(
 					function(text) {
-						irc.sendPrivMsg('#xetk', text);
+						irc.sendPrivMsg(data.channel, text);
 					}, 
 					lipsumOpts
 				);

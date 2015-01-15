@@ -1,7 +1,23 @@
 var request = require('request');
 
 var sedstack = { };
-var engine = { };
+var engine = {
+	valid: false,
+	type: 'DFA',
+	nick: '',
+	isAction: false,
+	msg: '',
+	search: '',
+	replace: '',
+	mods: '',
+	prematch: '',
+	match: '',
+	postmatch: '',
+	groups: [],
+	success: false,
+	result: '',
+	reply: ''
+};
 
 function handler(irc) {
 
@@ -17,8 +33,10 @@ function handler(irc) {
 				return;
 			}
 
+			engine = {}; // Clear it, just in case.
+
 			// Well it *looks* like a regex, now parse it.
-			parseSed(data);
+			parseSed(data, irc);
 
 			if(!engine.valid) {
 				// Oh no an error. Do something.
@@ -27,7 +45,6 @@ function handler(irc) {
 			sedstack[ data.nickname ].pop(); // don't want the sed command on the stack.
 
 			if(engine.type === 'DFA') {
-				console.log("Nick: " + engine.nick);
 				// Use normal JS .replace stuff.
 				if( engine.nick in sedstack ) {
 					try {
@@ -39,29 +56,23 @@ function handler(irc) {
 					}
 
 					var lines = sedstack[ engine.nick ];
-					console.log(lines);
 					for(var i = lines.length; i > 0; i--) {
 						engine.msg = lines[i - 1];
-						console.log("Testing: " + engine.msg);
 
 						var actiontest = /^\x01ACTION (.*?)\x01/.exec(engine.msg);
 						if(actiontest && actiontest.length > 0) {
 							engine.isAction = true;
 							engine.msg = actiontest[1];
-							console.log("result: " + engine.msg);
 						}
-						console.log("not an action");
 						
 						engine.result = engine.msg.replace(engine.search, engine.replace);
 						if(engine.result === engine.msg) {
 							// No change. Continue.
-							console.log("No change");
 							continue;
 						}
 						else {
 							// Found a Match.
 							engine.success = true;
-							console.log("Matched!");
 							if(engine.isAction) {
 								lines[i - 1] = "\x01ACTION " + engine.result + "\x01";
 							}
@@ -70,6 +81,9 @@ function handler(irc) {
 							}
 							break;
 						}
+					}
+					if(!engine.success) {
+						engine.err = "Sorry, " + data.nickname + ", No matches.";
 					}
 				}
 				else {
@@ -95,8 +109,6 @@ function handler(irc) {
 
 function addStack(data) {
 
-	//console.log(sedstack["ijz"][ sedstack["ijz"].length - 1 ]);
-
 	if(data.nickname in sedstack) {
 		sedstack[ data.nickname ].push(data.message);
 		while(sedstack[ data.nickname ].length > 100) {
@@ -109,47 +121,78 @@ function addStack(data) {
 
 }
 
-function parseSed(data) {
+function parseSed(data, irc) {
 
-	console.log("parseSed(): Nick: " + data.nickname);
+	var expr = '';
 
-	engine = {
-		valid: false,
-		type: 'DFA',
-                nick: data.nickname,
-                isAction: false,
-		msg: '',
-		search: '',
-		replace: '',
-		mods: '-i',
-                prematch: '',
-                match: '',
-                postmatch: '',
-                groups: [],
-		success: false,
-                result: '',
-		reply: ''
-	};
-
-	var nickre = /^([a-zA-Z0-9^\\_\{\}\[\]\|`~^-]+)\s?[:,~-]\s?s\//;
+	var nickre = /^(?:([a-zA-Z0-9^\\_\{\}\[\]\|`~^-]+)(?:\s?[:,~-]\s?))?(s\/.+)$/;
 	var groups = nickre.exec(data.message);
 	if(groups && groups.length > 0) {
-		console.log("Is this returning true?");
-		engine.nick = groups[1];
+		if(groups[1]) {
+			engine.nick = groups[1];
+		}
+		else {
+			engine.nick = data.nickname;
+		}
+		expr = groups[2];
         }
 
-	if(/\(\?<[^\)]+\)/.test(data.message)) {
+	if(/\(\?<[^\)]+\)/.test(expr)) {
 		engine.type = 'NFA';
 	}
-
-	var regex = /s\/(.+?)\/(.*?)\/([gmixs]*)?/;
-	var capts = regex.exec(data.message);
-	if(capts && capts.length > 0) {
-		engine.search = capts[1];
-		engine.replace = capts[2];
+	else {
+		engine.type = 'DFA';
 	}
 
-	console.log("parseSed(): Nick: " + engine.nick);
+	if(expr.match(/\//g).length < 2) {
+		// Already we have problems... not enough slashes for it to be a valid sed.
+		engine.valid = false;
+		return;
+	}
+
+	var indices = [];
+	var proceed = false;
+	for(var i = 1; i < expr.length; i++) {
+		// Start at 1 because expr[0] is 's'.
+		if(expr.charAt(i) == '\\' && (expr.charAt(i + 1) == '/' || expr.charAt(i + 1) == '\\')) {
+			if(proceed) {
+				proceed = false;
+				if(! i < (expr.length - 2)) {
+					continue;
+				}
+			}
+			proceed = true;
+		}
+		else if(expr.charAt(i) == '/') {
+			if (expr.charAt(i - 1) != '\\') {
+				indices.push(i);
+			}
+		}
+	}
+
+	// Populate engine.search, engine.replace, and engine.mods using the indices array.
+	for(var index = 0; index < indices.length; index++) {
+		if(index == 2) {
+			engine.mod = expr.slice(indices[index] + 1);
+			if(!engine.mod.match(/^((gi|ig|g|i)(\s|$))/)) {
+				engine.valid = false;
+				return;
+			}
+		}
+		else if(index == 1) {
+			if(indices.length < 3) { // i.e. there's no final / to terminate the sed.
+				// Slice from after the index to the end.
+				engine.replace = expr.slice(indices[index] + 1);
+			}
+			else { // Slice from after the index until before the next index.
+				engine.replace = expr.slice(indices[index] + 1, indices[index + 1]);
+			}
+		}
+		else if(index == 0) {
+			engine.search = expr.slice(indices[index] + 1, indices[index + 1]);
+		}
+				
+	}
 
 	return engine;
 }
@@ -157,14 +200,14 @@ function parseSed(data) {
 function makeReply(data, engine) {
 
 	if(data.nickname !== engine.nick) {
-		engine.reply += data.nickname
+		engine.reply = data.nickname
 			+ ' thinks that '
 			+ engine.nick
 			+ ' meant: ';
 
 	}
 	else {
-		engine.reply += data.nickname + ' meant: ';
+		engine.reply = data.nickname + ' meant: ';
 	}
 	
 	if(engine.isAction) {

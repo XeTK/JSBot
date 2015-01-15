@@ -64,6 +64,7 @@ function handler(irc) {
 							engine.isAction = true;
 							engine.msg = actiontest[1];
 						}
+
 						
 						engine.result = engine.msg.replace(engine.search, engine.replace);
 						if(engine.result === engine.msg) {
@@ -164,9 +165,10 @@ function parseSed(data, irc) {
 			proceed = true;
 		}
 		else if(expr.charAt(i) == '/') {
-			if (expr.charAt(i - 1) != '\\') {
+			if (expr.charAt(i - 1) != '\\' || (expr.charAt(i - 1) == '\\' && !proceed)) {
 				indices.push(i);
 			}
+			proceed = false;
 		}
 	}
 
@@ -185,7 +187,8 @@ function parseSed(data, irc) {
 				engine.replace = expr.slice(indices[index] + 1);
 			}
 			else { // Slice from after the index until before the next index.
-				engine.replace = expr.slice(indices[index] + 1, indices[index + 1]);
+				var tmp = expr.slice(indices[index] + 1, indices[index + 1]);
+				engine.replace = tmp.replace(/\\(\\|\/)/g, "$1");
 			}
 		}
 		else if(index == 0) {

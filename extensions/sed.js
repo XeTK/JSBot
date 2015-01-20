@@ -95,6 +95,7 @@ function handler(irc) {
 			else {
 				// Try and do fancy backreferencing stuff.
 				irc.sendPrivMsg(data.channel, "Lookbehind assertions will be supported soon.");
+				//doLookbehind(data, engine);
 				return;
 			}
 
@@ -107,6 +108,11 @@ function handler(irc) {
 			}
 		}
 	);
+}
+
+function doLookbehind(data, engine) {
+
+
 }
 
 function addStack(data) {

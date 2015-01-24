@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "cheerio": "^0.18.0",
     "colors": "^1.0.3",
     "mocha": "^2.0.1",
     "node-lipsum": "^1.0.1",

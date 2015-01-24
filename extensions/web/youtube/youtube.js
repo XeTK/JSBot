@@ -19,7 +19,7 @@ function handler(collective) {
 			if (groups && groups.length > 0) {
 
 				var id = groups[1];
-				var api_key = keys.youtube;
+				var apiKey = keys.youtube;
 
 				var options = {
 				    url: 'https://www.googleapis.com/youtube/v3/videos?id=' + id + '&key=' + api_key +'&part=snippet,statistics'

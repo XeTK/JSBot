@@ -125,7 +125,7 @@ function convertWOT(json) {
 			// trustworthyness
 			var trust = average(site["0"]);
 
-			ret += colourStr(trust, "Trustworthiness: " + trust + ' |');
+			ret += colourStr(trust, "Trustworthiness: " + trust + ' | ');
 		}
 
 		if (site["4"] != undefined) {
@@ -179,7 +179,9 @@ function average(obj) {
 			temp += obj[num];
 		}
 
-		return (temp / obj.length);
+		var result = (temp / obj.length);
+
+		return Math.round(result);
 	}
 }
 

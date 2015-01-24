@@ -56,7 +56,7 @@ function handler(collective) {
 				        str += ': Issue #';
 				        str += info.number;
 				        str += ' created: ';
-				        str += info.url;
+				        str += info.html_url;
 
 				        irc.sendPrivMsg(data.channel, str);
 				    }

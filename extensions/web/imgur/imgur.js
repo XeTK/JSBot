@@ -5,7 +5,9 @@ var colour = rek('irccolour.js');
 
 var keys   = rek('keys.json');
 
-function handler(irc) {
+function handler(collective) {
+
+	var irc = collective.irc;
 
 	irc.addCallBack(
 		'privmsg',

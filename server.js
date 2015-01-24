@@ -23,8 +23,13 @@ function joinServer() {
 
 var modules = loader.module_holder;
 
+var collective = {
+	"irc": irc,
+	"plugins": modules
+};
+
 for(var module in modules) 
-	modules[module](irc);
+	modules[module](collective);
 
 
 console.log('Ending application');

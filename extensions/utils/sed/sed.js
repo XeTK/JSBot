@@ -19,7 +19,9 @@ var engine = {
 	reply: ''
 };
 
-function handler(irc) {
+function handler(collective) {
+
+	var irc = collective.irc;
 
 	irc.addCallBack(
 		'privmsg',

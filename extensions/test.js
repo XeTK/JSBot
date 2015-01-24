@@ -1,6 +1,9 @@
 var Lipsum = require('node-lipsum');
 
-function handler(irc) {
+function handler(collective) {
+
+	var irc = collective.irc;
+
 	irc.addCallBack(
 		'privmsg',
 		function(data) {

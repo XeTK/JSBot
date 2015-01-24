@@ -1,12 +1,18 @@
 var request = require('request');
+var rek     = require('rekuire');
 
-var keys = require('../keys');
+var keys = rek('keys.json');
 
 function handler(irc) {
 
 	irc.addCallBack(
 		'privmsg',
 		function(data) {
+
+			var user = data.nickname;
+
+			if (!(user == 'XeTK' || user == 'ijz'))
+				return;
 
 			var regex = /^\.issue\s(.{1,140})$/g;
 

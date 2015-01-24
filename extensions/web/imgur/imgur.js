@@ -1,8 +1,9 @@
+var rek     = require('rekuire');
 var request = require('request');
 
-var colour = require('../irccolour');
+var colour = rek('irccolour.js');
 
-var keys = require('../keys');
+var keys   = rek('keys.json');
 
 function handler(irc) {
 
@@ -10,7 +11,7 @@ function handler(irc) {
 		'privmsg',
 		function(data) {
 
-			var regex = /(?:http(?:s)?:\/\/)(?:i\.)?imgur.com(?:\/(a|gallery))?\/([\w\d]{5,7})(?:.(png|jpg))?/g;
+			var regex = /(?:http(?:s)?:\/\/)(?:i\.)?imgur.com(?:\/(a|gallery))?\/([\w\d]{5,7})(?:.(png|jpg|gif))?/g;
 
 			var groups = regex.exec(data.message);
 
@@ -22,6 +23,8 @@ function handler(irc) {
 					iURL = 'https://api.imgur.com/3/album/'
 				} else if (groups[1] == 'gallery'){
 					iURL = 'https://api.imgur.com/3/gallery/image/';
+				} else {
+					iURL = 'https://api.imgur.com/3/image/';
 				}
 
 				var options = {
@@ -37,7 +40,7 @@ function handler(irc) {
 
 				        info = info.data;
 
-				        var blk = colour.getColour('black');
+					    var blk = colour.getColour('black');
 				        var wht = colour.getColour('white');
 				        var gre = colour.getColour('green');
 
@@ -60,6 +63,9 @@ function handler(irc) {
 
 				        if (info.views)
 				        	str += ' - ' + info.views + ' views';
+
+				        if (info.width || info.height || info.size)
+				        	str += ' - ' + info.width + 'px x ' + info.height + 'px, ' + parseInt(info.size / 1024) + 'kb';
 
 				        if (info.error)
 				        	str = info.error;

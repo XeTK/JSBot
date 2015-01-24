@@ -34,8 +34,15 @@ var files = walkSync(path + '/');
 
 files.forEach(
     function(file) {
-        console.log(('Loading plugin: ' + file).green);
-        require(file)(module_holder);
+        
+        var regex = /\.js$/g;
+
+        if (regex.test(file)) {
+            console.log(('Loading plugin: ' + file).green);
+            require(file)(module_holder);
+        } else {
+            console.log(('Not loading: ' + file).red);
+        }
     }
 );
 

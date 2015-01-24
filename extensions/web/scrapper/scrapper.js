@@ -146,8 +146,7 @@ function convertWOT(json) {
 
 				ret += colourStr(score, name + ': ' + score + ' | ');
 			}
-
-			ret = ret.substring(0, ret.length - 3);
+			
 		}
 
 		var bl = site.blacklists;
@@ -160,10 +159,10 @@ function convertWOT(json) {
 				tStr += black + ', ';
 			}
 
-			tStr = tStr.substring(0, tStr.length - 2);
-
 			ret += tStr;
 		}
+
+		ret = ret.substring(0, ret.length - 2);
 	}
 
 	return ret;

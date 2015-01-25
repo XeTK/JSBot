@@ -207,5 +207,5 @@ function colourStr(num, str) {
 }
 
 module.exports = function(module_holder) {
-    module_holder['scrapper'] = handler;
+    module_holder['scraper'] = handler;
 };

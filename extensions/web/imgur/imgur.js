@@ -1,9 +1,7 @@
 var rek     = require('rekuire');
 var request = require('request');
 
-var colour = rek('irccolour.js');
-
-var keys   = rek('keys.json');
+	
 
 function handler(collective) {
 

@@ -15,6 +15,7 @@ var red = colour.getColour('red');
 var dgr = colour.getColour('dark_green');
 var grn = colour.getColour('green');
 var brn = colour.getColour('brown');
+var blk = colour.getColour('black');
 var blu = colour.getColour('blue');
 var yel = colour.getColour('yellow');
 var pur = colour.getColour('magenta');
@@ -36,12 +37,17 @@ var wotCategories = {
 	"302": "Alternative or controversial medicine",
 	"303": "Opinions, religion, politics",
 	"304": "Other",
-	"501": "Good site ",
 	"401": "Adult content",
 	"402": "Incidental nudity",
 	"403": "Gruesome or shocking",
-	"404": "Site for kids "
+	"404": "Site for kids",
+	"501": "Good site"
 };
+
+var posWOTCats = [
+	"404",
+	"501"
+];
 
 function handler(collective) {
 
@@ -56,6 +62,7 @@ function handler(collective) {
 			var groups = rgx.exec(data.message);
 
 			if (groups && groups.length > 0) { 
+
 				var found = false;
 
 				for (var blackitem in blacklist) {
@@ -74,36 +81,56 @@ function handler(collective) {
 			    	url, 
 			    	function(error, response, html){
 
+			    		var str = '';
+
 				        if(!error){
 
 				            var $ = cheerio.load(html);
 
 				            var title = $('title').text();
 
-				            var str = '';
-				            str += colour.colourStr('[URL]', blu);
-				            str += ' ' + title;
-				            str += ' | ';
+				            title = title.trim();
 
-				            var apiKey = keys.wot;
+				           	if (title.length == 0) {
+				           		str += colour.colourStr('Could not get title for ' + url, red);
+				           	} else {
+				           		str += colour.colourStr('[URL]', blu);
+				            	str += ' ' + title;	
+				           	}
 
-							var wotURL = "http://api.mywot.com/0.4/public_link_json2?hosts=" + url + "/&key=" + apiKey;
+						} else {
+							str += colour.colourStr('Could not get title for ' + url, red);
+						}
 
-						    request(
-								wotURL, 
-								function(error, response, body){
+						str += ' | ';
 
-							        if(!error){
+			            var apiKey = keys.wot;
 
-										var wotSTR = convertWOT(body);
+						var wotURL = "http://api.mywot.com/0.4/public_link_json2?hosts=" + url + "/&key=" + apiKey;
 
-										str += wotSTR;
+					    request(
+							wotURL, 
+							function(error, response, body){
 
-										irc.sendPrivMsg(data.channel, str);
-									}
+						        if(!error){
+
+									var wotSTR = convertWOT(body);
+
+									if (wotSTR.length == 0) 
+										wotSTR = 'This website does not yet have a rating.';
+
+									str += colour.colourStr('W', red);
+									str += colour.colourStr('O', grn);
+									str += colour.colourStr('T', yel);
+
+									str += ' Rating: ' + wotSTR;
+
+									
 								}
-							);
-				        }
+
+								irc.sendPrivMsg(data.channel, str);
+							}
+						);
 			    	}
 			    );
 			}
@@ -122,17 +149,17 @@ function convertWOT(json) {
 		var site = json[key];
 
 		if (site["0"] != undefined) {
-			// trustworthyness
+			// trustworthiness
 			var trust = average(site["0"]);
 
-			ret += colourStr(trust, "Trustworthiness: " + trust + ' | ');
+			ret += colourStr(trust, "Trustworthiness: " + trust + ' | ', false);
 		}
 
 		if (site["4"] != undefined) {
-			// child friendlyness
+			// child friendliness
 			var child = average(site["4"]);
 
-			ret += colourStr(child, " Child safety: " + child + ' | ');
+			ret += colourStr(child, "Child safety: " + child + ' | ', false);
 		}
 
 		var cats = site.categories;
@@ -144,7 +171,17 @@ function convertWOT(json) {
 				score = average(score);
 				var name = wotCategories[cat];
 
-				ret += colourStr(score, name + ': ' + score + ' | ');
+				var negative = true;
+
+				// Dirty dirty work around, because i don't want to change the data structures...
+				for (var i = 0; i < posWOTCats.length; i++) {
+					if (cat == posWOTCats[i]) {
+						negative = false;
+						break;
+					}
+				}
+
+				ret += colourStr(score, name + ': ' + score + ' | ', negative);
 			}
 			
 		}
@@ -159,7 +196,7 @@ function convertWOT(json) {
 				tStr += black + ', ';
 			}
 
-			ret += tStr;
+			ret += colour.colourStr(tStr, blk, red);
 		}
 
 		ret = ret.substring(0, ret.length - 2);
@@ -185,8 +222,12 @@ function average(obj) {
 	}
 }
 
-function colourStr(num, str) {
+function colourStr(num, str, negative) {
 	var col = blu;
+
+	if (negative) {
+		num = (100 - num);
+	}
 
 	if (num > 90) {
 		col = dgr;

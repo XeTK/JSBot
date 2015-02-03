@@ -22,7 +22,7 @@ function handler(collective) {
 				var apiKey = keys.youtube;
 
 				var options = {
-				    url: 'https://www.googleapis.com/youtube/v3/videos?id=' + id + '&key=' + api_key +'&part=snippet,statistics'
+				    url: 'https://www.googleapis.com/youtube/v3/videos?id=' + id + '&key=' + apiKey +'&part=snippet,statistics'
 				};
 
 				function callback(error, response, body) {

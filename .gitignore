@@ -4,3 +4,4 @@ node_modules/*
 *.log
 irctestdata.txt
 *.json
+.DS_Store

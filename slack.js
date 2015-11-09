@@ -9,6 +9,7 @@ var SLACK_ENDPOINT = "https://slack.com"
 
 
 var AUTH =  "/api/rtm.start";
+var POST = "/api/chat.postMessage";
 
 var options = {
 	method: 'POST',
@@ -38,7 +39,7 @@ server.post(
 	function create(req, res, next) {
 
 		var userName = req.params.user_name;
-		var channel  = req.params.channel_name;
+		var channel  = req.params.channel_id;
 		var text     = req.params.text;
 
 		if (userName !== 'slackbot') {
@@ -106,7 +107,20 @@ function joinChannel(channel) {
 
 function sendPrivMsg(resp, message)  {
 
-	console.log(message);
+	var opts = options;
+
+	options['url'] = SLACK_ENDPOINT + POST;
+	options.formData['channel'] = resp;
+	options.formData['text'] = message;
+
+	request(
+		opts,
+		function (error, response, body) {
+		  if (error) throw new Error(error);
+
+		  console.log(body);
+		}
+	);
 
 }
 

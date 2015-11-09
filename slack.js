@@ -5,11 +5,11 @@ var keys = require('./keys.json');
 var opts = require('./options.json');
 
 var PORT = 3000;
-var SLACK_ENDPOINT = "https://slack.com"
+var SLACK_ENDPOINT = "https://slack.com/api/"
 
 
-var AUTH =  "/api/rtm.start";
-var POST = "/api/chat.postMessage";
+var AUTH = "rtm.start";
+var POST = "chat.postMessage";
 
 var options = {
 	method: 'POST',
@@ -17,7 +17,7 @@ var options = {
 		 'cache-control': 'no-cache'
 	 },
 	formData: {
-		token: 'xoxp-14183742036-14190542432-14188705779-85ad4e7594',
+		token: keys.slack,
 		username: opts.name
 	}
 };
@@ -85,30 +85,18 @@ function callback(call, func) {
 	}
 }
 
-function connect(reConnectCallBack) {
+function connect(reConnectCallBack) {}
 
-	var opts = options;
-
-	options['url'] = SLACK_ENDPOINT + AUTH;
-
-	request(
-		opts,
-		function (error, response, body) {
-		  if (error) throw new Error(error);
-
-		  console.log(body);
-		}
-	);
-
-}
-
-function joinChannel(channel) {
-
-}
+function joinChannel(channel) {}
 
 function sendPrivMsg(resp, message)  {
 	postMessage(resp, message, false);
 }
+
+function sendActionMsg(resp, message)  {
+	postMessage(resp, message, true);
+}
+
 
 function postMessage(resp, message, isMine) {
 	var opts = options;
@@ -127,11 +115,6 @@ function postMessage(resp, message, isMine) {
 		}
 	);
 }
-
-function sendActionMsg(resp, message)  {
-	postMessage(resp, message, true);
-}
-
 
 function addCallBack(call, func) {
 	var tmp = new callback(call, func);

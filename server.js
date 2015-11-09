@@ -28,7 +28,7 @@ function joinServer() {
 	//irc.sendPrivMsg('#xetk',   'Hello World');
 	//irc.sendActionMsg('#xetk', 'Hello World');
 }
-
+*/
 var modules = loader.module_holder;
 
 var collective = {
@@ -38,6 +38,6 @@ var collective = {
 
 for(var module in modules)
 	modules[module](collective);
-*/
+
 
 console.log('Ending application');

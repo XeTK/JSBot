@@ -33,31 +33,36 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-server.get(
-	'/',
-	function (req, res, next) {
-	  res.send("Hello World");
-	  return next();
-	}
-);
-
 server.post(
 	'hello',
 	function create(req, res, next) {
 
 		var userName = req.params.user_name;
-		var botPayload = {
-			text : 'Hello, ' + userName + '!'
-		};
+		var channel  = req.params.channel_name;
+		var text     = req.params.text;
 
 		if (userName !== 'slackbot') {
-	    res.send(200, botPayload);
-	  } else {
-	    res.send(200);
-	  }
 
-	   return next();
-	 }
+			var ret = {
+				time:     new Date(),
+				type:     'privmsg',
+				nickname: userName,
+				host:     '',
+				channel:  channel,
+				message:  text
+			};
+
+			for (var i = 0; i < callbacks.length; i++) {
+				var obj = callbacks[i];
+				obj.func(ret);
+			}
+
+		}
+
+		res.send(200);
+
+		return next();
+	}
 )
 
 server.listen(
@@ -101,11 +106,14 @@ function joinChannel(channel) {
 
 function sendPrivMsg(resp, message)  {
 
+	console.log(message);
+
 }
 
 function sendActionMsg(resp, message)  {
 
 }
+
 
 function addCallBack(call, func) {
 	var tmp = new callback(call, func);

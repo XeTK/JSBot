@@ -42,9 +42,10 @@ function connect() {
 		'hello',
 		function create(req, res, next) {
 
-			var userName = req.params.user_name;
-			var channel  = req.params.channel_id;
-			var text     = req.params.text;
+			var userName    = req.params.user_name;
+			var channel     = req.params.channel_id;
+			var channelName = req.params.channel_name
+			var text        = req.params.text;
 
 			if (userName !== 'slackbot') {
 
@@ -54,9 +55,10 @@ function connect() {
 					time:     new Date(),
 					type:     'privmsg',
 					nickname: userName,
-					host:     '',
-					channel:  channel,
-					message:  text
+					host:        '',
+					channel:     channel,
+					channelName: channelName,
+					message:     text
 				};
 
 				for (var i = 0; i < callbacks.length; i++) {

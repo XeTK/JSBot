@@ -17,7 +17,8 @@ var options = {
 		 'cache-control': 'no-cache'
 	 },
 	formData: {
-		token: 'xoxp-14183742036-14190542432-14188705779-85ad4e7594'
+		token: 'xoxp-14183742036-14190542432-14188705779-85ad4e7594',
+		username: opts.name
 	}
 };
 
@@ -106,26 +107,29 @@ function joinChannel(channel) {
 }
 
 function sendPrivMsg(resp, message)  {
+	postMessage(resp, message, false);
+}
 
+function postMessage(resp, message, isMine) {
 	var opts = options;
 
 	options['url'] = SLACK_ENDPOINT + POST;
 	options.formData['channel'] = resp;
 	options.formData['text'] = message;
+	options.formData['as_user'] = isMine;
 
 	request(
 		opts,
 		function (error, response, body) {
-		  if (error) throw new Error(error);
+			if (error) throw new Error(error);
 
-		  console.log(body);
+			console.log(body);
 		}
 	);
-
 }
 
 function sendActionMsg(resp, message)  {
-
+	postMessage(resp, message, true);
 }
 
 

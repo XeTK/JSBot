@@ -6,9 +6,9 @@ var keys   = rek('keys.json');
 
 function handler(collective) {
 
-	var irc = collective.irc;
+	var connector = collective.connector;
 
-	irc.addCallBack(
+	connector.addCallBack(
 		'privmsg',
 		function(data) {
 
@@ -56,7 +56,7 @@ function handler(collective) {
 
 				        if (info.title)
 				        	str += info.title;
-				        else 
+				        else
 				        	str += 'Nameless Picture';
 
 				        if (info.type)
@@ -71,7 +71,7 @@ function handler(collective) {
 				        if (info.error)
 				        	str = info.error;
 
-				        irc.sendPrivMsg(data.channel, str);
+				        connector.sendPrivMsg(data.channel, str);
 				    }
 				}
 

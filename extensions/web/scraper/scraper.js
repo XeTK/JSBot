@@ -51,16 +51,16 @@ var posWOTCats = [
 
 function handler(collective) {
 
-	var irc = collective.irc;
+	var connector = collective.connector;
 
-	irc.addCallBack(
+	connector.addCallBack(
 		'privmsg',
 		function(data) {
 
 			var rgx = /(((https?:\/\/)[\da-zA-Z\.-]+)((.*\?)(.*))?)/;
 			var groups = rgx.exec(data.message);
 
-			if (groups && groups.length > 0) { 
+			if (groups && groups.length > 0) {
 
 				var found = false;
 
@@ -71,13 +71,13 @@ function handler(collective) {
 					}
 				}
 
-				if (found) 
+				if (found)
 					return;
 
 				var url = groups[2];
 
 			    request(
-			    	url, 
+			    	url,
 			    	function(error, response, html){
 
 			    		var str = '';
@@ -94,7 +94,7 @@ function handler(collective) {
 				           		str += colour.colourStr('Could not get title for ' + url, red);
 				           	} else {
 				           		str += colour.colourStr('[URL]', blu);
-				            	str += ' ' + title;	
+				            	str += ' ' + title;
 				           	}
 
 						} else {
@@ -103,33 +103,33 @@ function handler(collective) {
 
 						str += ' | ';
 
-			            var apiKey = keys.wot;
+			      var apiKey = keys.wot;
 
 						var wotURL = "http://api.mywot.com/0.4/public_link_json2?hosts=" + url + "/&key=" + apiKey;
 
 					    request(
-							wotURL, 
+							wotURL,
 							function(error, response, body){
 
 						        if(!error){
 
-									var wotSTR = convertWOT(body);
+											var wotSTR = convertWOT(body);
 
-									if (wotSTR.length == 0) 
-										wotSTR = 'This website does not yet have a rating.';
+											if (wotSTR.length == 0)
+												wotSTR = 'This website does not yet have a rating.';
 
-									str += colour.colourStr('W', red);
-									str += colour.colourStr('O', grn);
-									str += colour.colourStr('T', yel);
+											str += colour.colourStr('W', red);
+											str += colour.colourStr('O', grn);
+											str += colour.colourStr('T', yel);
 
-									str += ' Rating: ' + wotSTR;
+											str += ' Rating: ' + wotSTR;
 
-									
-								}
 
-								irc.sendPrivMsg(data.channel, str);
-							}
-						);
+										}
+
+										connector.sendPrivMsg(data.channel, str);
+									}
+								);
 			    	}
 			    );
 			}
@@ -182,7 +182,7 @@ function convertWOT(json) {
 
 				ret += colourStr(score, name + ': ' + score + ' | ', negative);
 			}
-			
+
 		}
 
 		var bl = site.blacklists;

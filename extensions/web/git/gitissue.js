@@ -2,18 +2,19 @@ var request = require('request');
 var rek     = require('rekuire');
 
 var keys = rek('keys.json');
+var opts = rek('options.json');
 
 function handler(collective) {
 
-	var irc = collective.irc;
+	var connector = collective.connector;
 
-	irc.addCallBack(
+	connector.addCallBack(
 		'privmsg',
 		function(data) {
 
 			var user = data.nickname;
 
-			if (!(user == 'XeTK' || user == 'ijz'))
+			if (opts.admins.indexOf(user) == -1)
 				return;
 
 			var regex = /^\.issue\s(.{1,140})$/g;
@@ -23,10 +24,10 @@ function handler(collective) {
 			if (groups && groups.length > 0) {
 
 				var issueBody = '';
-				issueBody += ':octocat: This message was generated automatically by '; 
+				issueBody += ':octocat: This message was generated automatically by ';
 				issueBody += data.nickname;
 				issueBody += ' in ';
-				issueBody += data.channel;
+				issueBody += (opts.isIRC) ? data.channel : data.channelName;
 				issueBody += '. Once confirmed, please remove `unconfirmed` tag.';
 
 				var options = {
@@ -41,7 +42,7 @@ function handler(collective) {
 				    	'title'  : groups[1],
 				    	'body'   : issueBody,
 				    	'labels' : [
-				    		'bug', 
+				    		'bug',
 				    		'unconfirmed'
 				    	]
 				    }
@@ -58,7 +59,7 @@ function handler(collective) {
 				        str += ' created: ';
 				        str += info.html_url;
 
-				        irc.sendPrivMsg(data.channel, str);
+				        connector.sendPrivMsg(data.channel, str);
 				    }
 				}
 

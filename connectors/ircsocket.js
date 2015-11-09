@@ -13,8 +13,8 @@ var gOnDataCallBack      = null;
 var gOnReconnectCallBack = null;
 var gTLS                 = false;
 
-var priKeyPath = 'private-key.pem';
-var certPath   = 'public-cert.pem';
+var priKeyPath = '../certs/private-key.pem';
+var certPath   = '../certs/public-cert.pem';
 
 var options = {};
 
@@ -99,7 +99,7 @@ function handleReconnect() {
 function sendData(data) {
 	if (socket) {
 		data = data.replace(/(\r|\n)/g, "");
-		
+
 		console.log(('<- ' + String(data)).yellow);
 		socket.write(data + '\r\n');
 

@@ -9,6 +9,7 @@
     "mocha": "^2.0.1",
     "node-lipsum": "^1.0.1",
     "rekuire": "^0.1.9",
-    "request": "^2.51.0"
+    "request": "^2.51.0",
+    "restify": "^4.0.3"
   }
 }

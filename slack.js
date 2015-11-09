@@ -2,6 +2,7 @@ var restify = require('restify');
 var request = require("request");
 
 var keys = require('./keys.json');
+var opts = require('./options.json');
 
 var PORT = 3000;
 var SLACK_ENDPOINT = "https://slack.com"
@@ -23,7 +24,7 @@ var callbacks = [];
 
 var server = restify.createServer(
 	{
-	  name: 'JSBot',
+	  name: opts.name,
 	  version: '1.0.0'
 	}
 );
@@ -42,14 +43,14 @@ server.get(
 
 server.post(
 	'hello',
-	unction create(req, res, next) {
+	function create(req, res, next) {
 
 		var userName = req.body.user_name;
 		var botPayload = {
 			text : 'Hello, ' + userName + '!'
 		};
 
-		if (userName !== 'slackbot') {
+		if (userName !== opts.name) {
 	    res.send(200, botPayload);
 	  } else {
 	    res.send(200);
@@ -77,7 +78,7 @@ function callback(call, func) {
 	}
 }
 
-function connect(team, username, reConnectCallBack) {
+function connect(reConnectCallBack) {
 
 	var opts = options;
 

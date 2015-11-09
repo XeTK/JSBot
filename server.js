@@ -5,8 +5,6 @@ var slack  = require('./slack');
 console.log('Starting application');
 
 slack.connect(
-	"xetk",
-	"JSBot",
 	function() {
 		console.log("Reconnecting");
 	}

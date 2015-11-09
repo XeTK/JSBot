@@ -38,8 +38,8 @@ Please add extensions into the `./extensions/` folder under a appropriate direct
 
 function handler(collective) {
 
-    // This is the direct interface to the IRC socket.
-    var irc = collective.irc;
+    // This is the direct interface to the connector.
+    var connector = collective.connector;
 
     // This allows you to interact with other plugins within the same space.
     var plugins = collective.plugins;

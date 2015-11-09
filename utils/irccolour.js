@@ -1,4 +1,8 @@
 
+var rek  = require('rekuire');
+
+var opts = rek('options.json');
+
 function getColour(name) {
 	switch(name) {
 		case 'white':
@@ -39,12 +43,16 @@ function getColour(name) {
 }
 
 function colourStr(str, foreground, background) {
-	var ret = "\u0003" + foreground;
+	var ret = str;
 
-	if (background)
-		ret += "," + background;
+	if (opts.isIRC) {
+		ret = "\u0003" + foreground;
 
-	ret += str + "\u000f";
+		if (background)
+			ret += "," + background;
+
+		ret += str + "\u000f";
+	}
 
 	return ret;
 }

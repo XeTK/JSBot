@@ -27,7 +27,7 @@ function handler(collective) {
 				issueBody += ':octocat: This message was generated automatically by ';
 				issueBody += data.nickname;
 				issueBody += ' in ';
-				issueBody += (opts.isIRC) ? data.channel : data.channel_name;
+				issueBody += (opts.isIRC) ? data.channel : data.channelName;
 				issueBody += '. Once confirmed, please remove `unconfirmed` tag.';
 
 				var options = {

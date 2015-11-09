@@ -48,6 +48,8 @@ function connect() {
 
 			if (userName !== 'slackbot') {
 
+				console.log(('-> ' + text).cyan);
+
 				var ret = {
 					time:     new Date(),
 					type:     'privmsg',
@@ -98,6 +100,8 @@ function postMessage(resp, message, isMine) {
 	options.formData['channel'] = resp;
 	options.formData['text']    = message;
 	options.formData['as_user'] = isMine;
+
+	console.log(('<- ' + message).yellow);
 
 	request(
 		opts,

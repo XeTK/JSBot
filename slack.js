@@ -45,7 +45,7 @@ server.post(
 	'hello',
 	function create(req, res, next) {
 
-		var userName = req.body.user_name;
+		var userName = req.params.user_name;
 		var botPayload = {
 			text : 'Hello, ' + userName + '!'
 		};

@@ -2,14 +2,14 @@
 
 ## TODO
 
-- [ ] User configurable (Everything is hard coded right now.).
 - [ ] Easy configuration of the SSL certificates.
 - [ ] Better error handling for missing configuration.
 - [ ] Unit tests.
 - [ ] Code reviews and refactor.
-- [ ] Comment current code base. 
-- [ ] Tidy up directory structure.
+- [ ] Comment current code base.
+- [ ] Some sort of CI maybe Travis
 - [ ] Sandbox channels from each other.
+- [ ] Implement database data store.
 
 ## Install
 
@@ -19,11 +19,15 @@
 
 3. Execute `npm install`.
 
-4. Next copy or rename the `keys.json.example` file to `keys.json`.
+4. Next copy or rename the `options.json.example` file to `options.json`.
 
-5. Edit the keys.json file to contain the API authentication keys.
+5. Edit the options.json file to match your configuration.
 
-6. Finally execute `npm start` and this will load the bot up to join the channel.
+6. Next copy or rename the `keys.json.example` file to `keys.json`.
+
+7. Edit the keys.json file to contain the API authentication keys.
+
+8. Finally execute `npm start` and this will load the bot up to join the channel.
 
 
 ## Example extension
@@ -48,6 +52,13 @@ module.exports = function(module_holder) {
 };
 
 ```
+## Slack Support.
+
+TODO:
+
+[Create WebHooks](https://slack.com/services/new/outgoing-webhook)
+[authentication](https://api.slack.com/web#Authentication)
+
 
 ## Creating SSL Certificates.
 

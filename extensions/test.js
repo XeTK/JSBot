@@ -2,9 +2,9 @@ var Lipsum = require('node-lipsum');
 
 function handler(collective) {
 
-	var irc = collective.irc;
+	var connector = collective.connector;
 
-	irc.addCallBack(
+	connector.addCallBack(
 		'privmsg',
 		function(data) {
 			if (data.message == 'test') {
@@ -18,8 +18,8 @@ function handler(collective) {
 
 				lipsum.getText(
 					function(text) {
-						irc.sendPrivMsg(data.channel, text);
-					}, 
+						connector.sendPrivMsg(data.channel, text);
+					},
 					lipsumOpts
 				);
 			}

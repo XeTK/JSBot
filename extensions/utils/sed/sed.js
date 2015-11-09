@@ -21,9 +21,9 @@ var engine = {
 
 function handler(collective) {
 
-	var irc = collective.irc;
+	var connector = collective.connector;
 
-	irc.addCallBack(
+	connector.addCallBack(
 		'privmsg',
 		function(data) {
 
@@ -54,7 +54,7 @@ function handler(collective) {
 						}
 					}
 					catch(err) {
-						irc.sendPrivMsg(data.channel, data.nickname + ": " + err);
+						connector.sendPrivMsg(data.channel, data.nickname + ": " + err);
 						return;
 					}
 
@@ -68,7 +68,7 @@ function handler(collective) {
 							engine.msg = actiontest[1];
 						}
 
-						
+
 						engine.result = engine.msg.replace(engine.search, engine.replace);
 						if(engine.result === engine.msg) {
 							// No change. Continue.
@@ -96,17 +96,17 @@ function handler(collective) {
 			}
 			else {
 				// Try and do fancy backreferencing stuff.
-				irc.sendPrivMsg(data.channel, "Lookbehind assertions will be supported soon.");
+				connector.sendPrivMsg(data.channel, "Lookbehind assertions will be supported soon.");
 				//doLookbehind(data, engine);
 				return;
 			}
 
 			if(!engine.err && engine.success) {
 				makeReply(data, engine);
-				irc.sendPrivMsg(data.channel, engine.reply);
+				connector.sendPrivMsg(data.channel, engine.reply);
 			}
 			else {
-				irc.sendPrivMsg(data.channel, engine.err);
+				connector.sendPrivMsg(data.channel, engine.err);
 			}
 		}
 	);
@@ -219,7 +219,7 @@ function parseSed(data, irc) {
 				engine.search = expr.slice(indices[index] + 1, indices[index + 1]);
 			}
 		}
-				
+
 	}
 
 	return engine;
@@ -237,7 +237,7 @@ function makeReply(data, engine) {
 	else {
 		engine.reply = data.nickname + ' meant: ';
 	}
-	
+
 	if(engine.isAction) {
 		engine.reply += '* '
 			+ engine.nick
@@ -250,4 +250,3 @@ function makeReply(data, engine) {
 module.exports = function(module_holder) {
     module_holder['sed'] = handler;
 };
-

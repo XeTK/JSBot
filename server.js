@@ -1,39 +1,48 @@
-//var irc    = require('./irc');
-var loader = require('./loader');
-var slack  = require('./slack');
+var opts   = require('./json/options.json');
+
+var irc    = require('./connectors/irc');
+var slack  = require('./connectors/slack');
+
+var loader = require('./utils/loader');
 
 console.log('Starting application');
 
-slack.connect(
-	function() {
-		console.log("Reconnecting");
+var connector = null;
+
+if (opts.isIRC) {
+
+	irc.connect(
+		opts.server,
+		opts.port,
+		'SpunkyJrTest',
+		opts.isTLS,
+		function(){
+			joinServer();
+		}
+	);
+
+	joinServer();
+
+	function joinServer() {
+		var channels = opts.channels;
+
+		for (var channel in channels) {
+			irc.joinChannel(channel);
+		}
 	}
-);
 
-/*
-irc.connect(
-	'irc.aberwiki.org',
-	6667,
-	'SpunkyJrTest',
-	false,
-	function(){
-		joinServer();
-	}
-);
+	connector = irc;
 
-joinServer();
-
-function joinServer() {
-	irc.joinChannel('#xetk');
-	//irc.sendPrivMsg('#xetk',   'Hello World');
-	//irc.sendActionMsg('#xetk', 'Hello World');
+} else {
+	slack.connect();
+	connector = slack;
 }
-*/
+
 var modules = loader.module_holder;
 
 var collective = {
-	"irc": slack,
-	"plugins": modules
+	"connector" : connector,
+	"plugins"   : modules
 };
 
 for(var module in modules)

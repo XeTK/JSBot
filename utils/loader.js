@@ -6,7 +6,7 @@ var path_module = require('path');
 
 var module_holder = {};
 
-var path = path_module.join(__dirname, 'extensions');
+var path = path_module.join(__dirname, '../extensions');
 
 var walkSync = function(dir, filelist) {
 
@@ -28,13 +28,13 @@ var walkSync = function(dir, filelist) {
     );
 
     return filelist;
-}; 
+};
 
 var files = walkSync(path + '/');
 
 files.forEach(
     function(file) {
-        
+
         var regex = /\.js$/g;
 
         if (regex.test(file)) {

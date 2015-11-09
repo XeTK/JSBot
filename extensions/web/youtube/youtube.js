@@ -7,9 +7,9 @@ var keys   = rek('keys.json');
 
 function handler(collective) {
 
-	var irc = collective.irc;
+	var connector = collective.connector;
 
-	irc.addCallBack(
+	connector.addCallBack(
 		'privmsg',
 		function(data) {
 			var regex = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/watch\?.+&v=))([\w-]{11})(?:.+)?/g;
@@ -30,7 +30,7 @@ function handler(collective) {
 				        var info = JSON.parse(body);
 
 				        if (!info.error) {
-		
+
 					        info = info.items[0];
 
 					        console.log(JSON.stringify(info));
@@ -42,7 +42,7 @@ function handler(collective) {
 					        var wht = colour.getColour('white');
 					        var red = colour.getColour('red');
 					        var grn = colour.getColour('green');
-					    	var blu = colour.getColour('blue');
+					    		var blu = colour.getColour('blue');
 
 					        var str = '';
 
@@ -57,11 +57,11 @@ function handler(collective) {
 					        str += colour.colourStr(stats.likeCount, grn, null);
 					        str += ' ';
 					        str += colour.colourStr(stats.dislikeCount, red, null);
-							str += ' dislikes';
+									str += ' dislikes';
 
-					        irc.sendPrivMsg(data.channel, str);
+					        connector.sendPrivMsg(data.channel, str);
 						}
-				    }
+				  }
 				}
 
 				request(options, callback);

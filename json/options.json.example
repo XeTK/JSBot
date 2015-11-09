@@ -1,0 +1,9 @@
+{
+  "name": "JSBot",
+  "isIRC": false,
+  "admins": ["xetk"],
+  "channels": ["#xetk"],
+  "port": 6667,
+  "server": "irc.aberwiki.org",
+  "isTLS": false
+}

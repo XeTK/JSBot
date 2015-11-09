@@ -50,7 +50,7 @@ server.post(
 			text : 'Hello, ' + userName + '!'
 		};
 
-		if (userName !== opts.name) {
+		if (userName !== 'slackbot') {
 	    res.send(200, botPayload);
 	  } else {
 	    res.send(200);

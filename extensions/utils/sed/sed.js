@@ -38,7 +38,7 @@ function handler(collective) {
 			engine = {}; // Clear it, just in case.
 
 			// Well it *looks* like a regex, now parse it.
-			parseSed(data, irc);
+			parseSed(data, connector);
 
 			sedstack[ data.nickname ].pop(); // don't want the sed command on the stack.
 

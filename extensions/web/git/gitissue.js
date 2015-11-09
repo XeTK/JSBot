@@ -14,7 +14,7 @@ function handler(collective) {
 
 			var user = data.nickname;
 
-			if (!(opts.admins.includes(user)))
+			if (opts.admins.indexOf(user) == -1)
 				return;
 
 			var regex = /^\.issue\s(.{1,140})$/g;
